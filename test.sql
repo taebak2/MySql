@@ -18,9 +18,9 @@ create table 학생(
 
 create table 직원(
 	사번 varchar(10),
-    이름 varchar(20),
-    나이 int,
-    성별 varchar(2)
+    	이름 varchar(20),
+    	나이 int,
+    	성별 varchar(2)
 );
 
 insert into 학생 values("s001","김연아","4","여");
@@ -37,7 +37,7 @@ SELECT * from 학생;
 
 
 CREATE database univDB;
-use univDB;
+	use univDB;
 
 create table 학생(
 학번 char(4) not null,
