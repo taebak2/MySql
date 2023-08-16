@@ -1,12 +1,14 @@
 create database test;
 use test;
 -- use test를 실행하고나서 table을 실행해야 오류 안나옴 
--- 단축키 : ctrl + enter 한 줄 실행
-	   -- ctrl + B 쿼리 정리 정렬
-	   -- ctrl + / 주석
-	   -- ctrl + shift + enter 다중 실행
-	   -- ctrl + L 한 줄 삭제 
-       -- ctrl + D 한 줄 복사
+
+-- 단축키:  
+	    -- ctrl + enter 한 줄 실행
+	    -- ctrl + B 쿼리 정리 정렬
+	    -- ctrl + / 주석
+	    -- ctrl + shift + enter 다중 실행
+	    -- ctrl + L 한 줄 삭제 
+      	    -- ctrl + D 한 줄 복사
        
 create table 학생(
 	학번 varchar(10),
