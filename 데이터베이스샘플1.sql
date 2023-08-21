@@ -2,7 +2,7 @@ create database univDB;
 use univDB;
 
 create table 학생(
-    학번 char(4) not null,
+	학번 char(4) not null,
     이름 varchar(20) not null,
     주소 varchar(50) null default "미정",
     학년 int not null,
@@ -14,7 +14,7 @@ create table 학생(
 );
 
 create table 과목 (
-    과목번호 char(4) not null primary key,
+	과목번호 char(4) not null primary key,
     이름 varchar(20) not null,
     강의실 char(3) not null,
     개설학과 varchar(20) not null,
@@ -23,7 +23,7 @@ create table 과목 (
 
 
 create table 수강(
-    학번 char(6) not null,
+	학번 char(6) not null,
     과목번호 char(4) not null,
     신청날짜 date not null,
     중간성적 int null default 0,
@@ -139,3 +139,60 @@ select 이름 from 학생 where 학번 in('s001','s003','s004');
 -- 학번이 s001,s003,s004인 학생의 이름 
 select 이름 from 학생 where 학번 in (select 학번 from 수강 where 과목번호='c002');
 -- 방법 2
+
+ -- '정보보호' 과목을 수강한 학생의 이름을 검색 (중첩 후부 질의문)
+ -- in : 결과가 여러개일 때 사용 
+ -- exists :하위 쿼리가 결과를 반환할 경우(행이 존재하는 경우) 참,하위 쿼리가 결과를 반환하지 않을 경우(행이 존재하지 않는 경우) 거짓만을 반환함
+ 
+select 이름 from 학생 where 학번 in (select 학번 from 수강 where 과목번호 in(select 과목번호 from 과목 where 이름 = '정보보호'));
+select 학번 from 수강 where 과목번호  = (select 과목번호 from 과목 where 이름 = '정보보호');
+select 과목번호 from 과목 where 이름 = '정보보호';
+
+select 이름 from 학생  where exists ( select * from 수강 where 수강.학번=학생.학번 and 과목번호 = 'c002');
+-- 과목번호가 'c002'인 과목을 수강한 학생의 이름을 검색
+
+select 이름 from 학생 where not exists
+(select * from 수강 where 수강.학번=학생.학번);
+-- 학생 중에서 한 과목도 수강하지 않은 학생의 이름 검색
+-- 수강.학번 = 학생.학번 : 수강과 학생을 연결하고, 두 테이블 간에 공통된 값을 사용하여 조인을 수행 
+
+select * from 학생; -- 7개
+select * from 수강; -- 9개
+
+select * from 학생,수강; -- 2개의 테이블을 다 가져옴 (63개)
+select * from 학생,수강 where 학생.학번=수강.학번; -- 학생들의 수강 내역이 학번을 기준으로 연결되어 나타남
+select 이름 from 학생,수강 where 학생.학번=수강.학번;
+select distinct 이름 from 학생,수강 where 학생.학번=수강.학번; -- 중복된 이름 제거하고 1개씩만 출력 
+select * from 학생 join 수강 on 학생.학번=수강.학번; -- 학생들의 정보와 해당 학생이 수강한 강좌에 관한 정보가 함께 표시
+
+-- 학생 중에서 과목번호가 'c002'인 과목을 수강한 학생의 학번과 이름, 과목번호 그리고 변환중간성적(학생별 중간 성적의 10% 가산 점수)을 검색
+select 학생.학번, 이름, 과목번호, 중간성적+(중간성적*0.1) as 변환중간성적
+from 학생, 수강
+where 학생.학번=수강.학번 and 과목번호 = 'c002';
+
+select 학생.학번, 이름, 과목번호, 중간성적+(중간성적*0.1) as 변환중간성적
+from 학생 join 수강 on 학생.학번=수강.학번
+where 과목번호 = 'c002';
+
+-- 정보보호 과목을 수강하는 학생들의 학번, 이름 및 과목번호를 검색
+select 학생.학번,학생.이름,수강.과목번호 from (학생 join 수강 on 학생.학번=수강.학번) 
+join 과목 on 수강.과목번호=과목.과목번호 where 과목.이름 = '정보보호';
+
+create table 학생1 as (select * from 학생); -- 테이블 복사 : 학생 테이블을 복사해 학생1번 테이블을 만듬 
+create table 수강1 as (select * from 수강); -- 
+create table 과목1 as (select * from 과목); -- 
+
+insert into 학생1(학번,이름,주소,학년,나이,성별,휴대폰번호,소속학과) -- 리스트
+Values('g001','김연아2','서울 서초',4,23,'여','010-111-2222','컴퓨터'); -- 리스트 값 
+
+insert into 학생1(학번,이름,학년,성별) values('g002','김연아3',4,'여');
+
+select * from 학생1;
+
+insert into 학생1(이름,학년,나이,성별,소속학과,학번) values('홍길동2',1,26,'남','통계','g002');
+
+insert into 학생1(학년,나이,성별,소속학과,학번,이름)
+values (3,30,'남','정보통신','g003','이승엽2');
+select * from 학생1;
+delete from 학생1 where 이름='김연아3';
+select * from 학생1;

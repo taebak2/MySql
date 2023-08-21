@@ -1,26 +1,26 @@
 create database test;
 use test;
 -- utf8 설정, use test를 실행하고나서 table을 실행해야 오류 안나옴 
--- 단축키 :   ctrl + enter 한 줄 실행 
+-- 단축키 : ctrl + enter 한 줄 실행 
 	   -- ctrl + B 쿼리 정리 정렬 
 	   -- ctrl + / 주석
 	   -- ctrl + shift + enter 다중 실행
 	   -- ctrl + L 한 줄 삭제 
-       	   -- ctrl + D 한 줄 복사 
+       -- ctrl + D 한 줄 복사 
        
 create table 학생(
 	학번 varchar(10),
-    	이름 varchar(20),
-    	학년 int,
-    	성별 varchar(2)
+    이름 varchar(20),
+    학년 int,
+    성별 varchar(2)
 );
 -- 실행은 마지막 세미콜론에서 실행해야함
 
 create table 직원(
 	사번 varchar(10),
-    	이름 varchar(20),
-    	나이 int,
-    	성별 varchar(2)
+    이름 varchar(20),
+    나이 int,
+    성별 varchar(2)
 );
 
 insert into 학생 values("s001","김연아","4","여"); -- 학생 테이블에 존재하는 모든 필드를 선택 후 값 입력
@@ -38,10 +38,10 @@ SELECT * from 학생;
 
 
 CREATE database univDB;
-	use univDB;
+use univDB;
 
 create table 학생(
-학번 char(4) not null, -- 필수 입력을 해야해서 null이 안된다. (데이터 값이 비어있으면 안된다) 무조건 4글자만 써야함
+학번 char(4) not null, -- 학번 필드에 null 값을 허용하지 않도록 지정 (데이터 값이 비어있으면 안된다) 무조건 4글자만 써야함
 이름 varchar(20) not null, -- 20글자 이하로 사용가능
 주소 varchar(50) null default "미정", -- null일때 null대신 "미정"으로 표시 
 학년 int not null,
