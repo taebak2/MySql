@@ -6,7 +6,7 @@ use test;
 	   -- ctrl + / 주석
 	   -- ctrl + shift + enter 다중 실행
 	   -- ctrl + L 한 줄 삭제 
-       -- ctrl + D 한 줄 복사 
+       	   -- ctrl + D 한 줄 복사 
        
 create table 학생(
 	학번 varchar(10),
@@ -41,18 +41,18 @@ CREATE database univDB;
 use univDB;
 
 create table 학생(
-학번 char(4) not null, -- 학번 필드에 null 값을 허용하지 않도록 지정 (데이터 값이 비어있으면 안된다) 무조건 4글자만 써야함
-이름 varchar(20) not null, -- 20글자 이하로 사용가능
-주소 varchar(50) null default "미정", -- null일때 null대신 "미정"으로 표시 
+학번 char(4) not null, 			-- 학번 필드에 null 값을 허용하지 않도록 지정 (데이터 값이 비어있으면 안된다) 무조건 4글자만 써야함
+이름 varchar(20) not null, 		-- 20글자 이하로 사용가능
+주소 varchar(50) null default "미정",    -- null일때 null대신 "미정"으로 표시 
 학년 int not null,
 나이 int null,
 성별 char(1) not null,
 휴대폰번호 char(14) null,
 소속학과 varchar(20) null,
-primary key(학번) -- primary key값 내에서 중복이 존재하면 안된다. 학번 속성 내에서 중복이 존재하면 안된다... 
+primary key(학번) 	-- primary key값 내에서 중복이 존재하면 안된다. 학번 속성 내에서 중복이 존재하면 안된다... 
 );
 
-select * from 학생; -- select * from 학생 : 학생 테이블의 모든 필드를 조회
+select * from 학생; 	-- select * from 학생 : 학생 테이블의 모든 필드를 조회
 
 create table 수강(
 학번 char(6) not null,
@@ -66,7 +66,7 @@ primary key(학번,과목번호) -- primary key로 지정을 하면 중복값을
 
 -- 사용자 계정 생성
 Create user 'manager' identified by '1234'; -- 사용자 manager, 비밀번호 1234
-grant all on *.* to 'manager'; --  사용자 'manager'에게 모든 데이터베이스와 테이블에 대한 모든 권한을 부여, *.*는 "모든 데이터베이스의 모든 테이블
+grant all on *.* to 'manager'; 		    --  사용자 'manager'에게 모든 데이터베이스와 테이블에 대한 모든 권한을 부여, *.*는 "모든 데이터베이스의 모든 테이블
 
 insert into 학생 values('s001','김연아','서울 서초',4,23,'여','010-1111-2222','컴퓨터');
 insert into 학생 values('s002','홍길동',DEFAULT,1,26,'남',NULL,'통계');
