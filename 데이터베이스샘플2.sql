@@ -173,15 +173,12 @@ select count(*) from 교수; -- 7
 use univdb;
 
 -- 대학생 테이블에서 학과코드를 중복제거하고 검색하세요
-
 select distinct 학과코드 from 대학생; -- 7개 
 -- 시험 테이블에서 국어가 90점 이상이거나 수학이 90점 이상인 학생의 학번, 국어, 수학 점수를 출력하세요
-
 select 학번, 국어, 수학 from 시험 where 국어>=90 or 수학>=90; -- 22개
 
 select 이름, 학년, 소속학과, 휴대폰번호 from 학생 where (학년>=1 and 학년<=3) or not(소속학과='컴퓨터'); 
 -- 1,2,3학년 학생이거나 '컴퓨터'학과에 소속되지 않은 학생의 이름, 학년, 소속학과, 휴대폰번호 검색
-
 select 이름, 학년, 소속학과, 휴대폰번호 from 학생 where(학년 between 1 and 3) or not(소속학과='컴퓨터');
 -- 방법2 
 
@@ -231,12 +228,10 @@ select 학과코드,count(*) as '2015년 인원수' from 대학생 where 입학�
 -- 대학생 테이블에서 이름이 '제'로 시작하는
 -- 학생들의 이름, 학번, 생년월일을 검색하되
 -- 성별이 여자인 학생들만 검색하세요
-
 select 이름, 학번, 생년월일  from 대학생 where 이름 like '제%' and 성별 = 'F';
 
 -- 교수 테이블에서 마씨 성을 가진 교수의
 -- 학과코드별 인원수를 검색하세요
-
 select 학과코드, 학과담당교수 from 교수 where 학과담당교수 like '마%';
 
 -- 성별이 여자이거나 국어점수가 90점 이상인 학생의 학번을 검색하세요
@@ -304,3 +299,29 @@ select * from 남자대학생; -- 38개
 create table 우수응시자 as (select * from 시험 where 국어>=80 and 영어>=80);
 select * from 우수응시자;
 
+-- 교수 테이블을 복사해서 교수2 테이블을 생성하세요
+create table 교수2 as(select * from 교수);
+
+-- 교수2 테이블에서 물리학과 교수 이름을 아인슈타인으로 변경
+update 교수2 set 학과담당교수='아인슈타인' where 학과명='물리학과';
+-- update (table) set (변경사항) where (field)
+
+select * from 교수2;
+
+-- 대학생, 시험 테이블을 복사하여 대학생2, 시험 2 테이블을 생성
+create table 대학생2 as(select * from 대학생);
+create table 시험2 as(select * from 시험);
+-- 대학생2 테이블에서 시험에 응시하지 않은 학생의 전화번호를 null로 설정
+update 대학생2 set 전화번호=null where 학번 not in(select 학번 from 시험2);
+select * from 대학생2 where 전화번호 is null;
+
+
+-- 대학생2에서 성별을 남학생, 여학생으로 변경
+update 대학생2 set 성별='남' where 성별 = 'M';
+update 대학생2 set 성별='여' where 성별 = 'F';
+
+-- 대학생2, 교수2 테이블을 이용
+-- 학과별 인원이 10명 미만인 교수2 테이블 정보를 삭제
+delete from 교수2 
+where 학과코드 in ( select 학과코드 from 대학생2 group by 학과코드 having count(*) <10);
+select * from 교수2;

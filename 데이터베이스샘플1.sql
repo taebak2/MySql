@@ -196,3 +196,36 @@ values (3,30,'남','정보통신','g003','이승엽2');
 select * from 학생1;
 delete from 학생1 where 이름='김연아3';
 select * from 학생1;
+
+update 학생1 set 학년=3 where 이름='이은진';
+-- 이은진 학생의 학년을 3학년으로 변경
+select * from 학생1 where 이름='이은진';
+
+update 학생1 set 학년=학년+1, 소속학과='자유전공학부'where 학년=4; 
+-- 4학년 학생들의 학년을 1씩 증가시키고 소속학과를 자유전공학부로 변경
+select * from 학생1;
+
+update 학생1 set 소속학과 = null where 학번 not in (select 학번 from 수강1);
+-- 수강 내용이 없는 학생의 소속학과를 null 값으로 수정
+-- "학번"이 "수강1" 테이블의 학번 목록에 없는 경우에만 이 작업을 수행
+select * from 학생1;
+
+select 학번 from 학생1 where 이름='이은진';
+
+update 수강1 set 학번 = (select 학번 from 학생1 where 이름='이은진') where 학번='s003';
+select * from 수강1 where 학번='s003' or 학번='s007';
+
+delete from 학생1 where 이름='송윤아';
+select * from 학생1;
+-- '송윤아' 학생의 모든 정보를 삭제
+
+delete from 학생1 where 학년=3;
+select * from 학생1;
+-- '3'학년 모든 학생 정보를 삭제
+
+delete from 과목1 
+where 과목번호 in ( select 과목번호 from 수강1 group by 과목번호 having count(*) <2);
+select * from 과목1;
+-- 수강자가 2명 미만인 과목에 대한 과목 정보를 모두 삭제
+
+create database chap5;
