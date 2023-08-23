@@ -1,5 +1,5 @@
 create table 학생(
-	학번 varchar(20),
+    학번 varchar(20),
     이름 varchar(10),
     나이 int,
     성별 varchar(5),
