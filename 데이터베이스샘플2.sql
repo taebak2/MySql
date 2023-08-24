@@ -196,7 +196,7 @@ select 이름, 학년, 소속학과 from 학생 where 소속학과 = '컴퓨터'
 select 이름, 학년, 소속학과 from 학생 where 소속학과 = '컴퓨터' or 소속학과 = '정보통신' order by 학년 desc;
 -- desc 정렬 : 내림차순
 -- select 이름, 학년, 소속학과 from 학생 where 소속학과 = '컴퓨터' or '정보통신' order by 학년 desc;
--- or 이나 and 를 사용시 소속학과를 두번 다 입력해줘야함 
+-- or 이나 and 를 사용시 필드명 각각 입력 해줘야함 
 
 select * from 학생 order by 학년 asc, 이름 desc;
 -- 학년을 기준으로 오름차순, 학년이 같은 경우 이름을 기준으로 내림차순 정렬 
@@ -212,6 +212,7 @@ select 학번, 수학, 영어 from 시험 order by 수학 desc, 영어 limit 10;
 -- 대학생 테이블에서 입학년도가 2016년이 아니면서 성별이 남자인 학생의
 -- 인원수를 검색하되, 별명은 '남학생 인원수'로 설정하시오
 select count(*) '남학생 인원수' from 대학생 where 성별 ='M' and not (입학년도='2016'); 
+
 -- 대학생 테이블에서 학과코드별로 인원수를 검색하세요
 select 학과코드,count(*) '학과코드 인원수' from 대학생 group by 학과코드;
 
@@ -282,6 +283,7 @@ where s1.학년>s2.학년;
 
 -- 시험을 응시하지 않은 학생을 포함하여
 -- 이름, 학번, 국어, 영어 점수를 검색하세요
+
 select 이름,대학생.학번,국어,영어 from 대학생
 left outer join 시험 on 대학생.학번=시험.학번;
 -- 대학생 테이블에 시험 테이블에 있는 column(국어,영어)을 추가 + 대학생 테이블 모두를 출력 
@@ -291,7 +293,7 @@ select 이름 from 대학생 where 학번 not in (select 학번 from 시험);
 
 select 이름 from 대학생
 left outer join 시험 on 대학생.학번=시험.학번 where 국어 is null;
-
+-- "대학생" 테이블의 모든 레코드와 "시험" 테이블에 해당하는 레코드들을 합치는 것
 
 create table 남자대학생 as (select * from 대학생 where 성별='M');
 select * from 남자대학생; -- 38개
@@ -319,6 +321,7 @@ select * from 대학생2 where 전화번호 is null;
 -- 대학생2에서 성별을 남학생, 여학생으로 변경
 update 대학생2 set 성별='남' where 성별 = 'M';
 update 대학생2 set 성별='여' where 성별 = 'F';
+
 
 -- 대학생2, 교수2 테이블을 이용
 -- 학과별 인원이 10명 미만인 교수2 테이블 정보를 삭제
