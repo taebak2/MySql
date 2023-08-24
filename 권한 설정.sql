@@ -19,3 +19,4 @@ grant all on *.* to 'user4'@'%' with grant option;
 grant select on univdb.학생 to 'user2'@'localhost';
 -- 'univdb' 데이터베이스에 있는 '학생' 테이블에 대해 'user2'@'localhost' 사용자에게 SELECT 권한을 부여
 -- 해당 사용자는 로컬 호스트에서만 접근
+-- 127.1.1.1, 127.0.0.1 = localhost 
