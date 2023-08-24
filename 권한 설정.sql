@@ -6,6 +6,7 @@ create user 'user4'@'%' identified by '4444';
 -- 사용자 이름: user4
 -- 패스워드: 4444
 select host,user from mysql.user;
+-- mysql.user 테이블에서 호스트와 사용자 정보를 조회
 
 grant insert,update,delete on univdb.* to 'user1'@'127.0.0.1';
 -- univdb' 데이터베이스에 있는 모든 테이블에 대해 'user1'@'127.1.1.1' 사용자에게 INSERT, UPDATE, DELETE 권한을 부여
