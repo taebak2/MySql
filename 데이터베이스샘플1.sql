@@ -2,7 +2,7 @@ create database univDB;
 use univDB;
 
 create table 학생(
-    학번 char(4) not null,
+	학번 char(4) not null,
     이름 varchar(20) not null,
     주소 varchar(50) null default "미정",
     학년 int not null,
@@ -14,7 +14,7 @@ create table 학생(
 );
 
 create table 과목 (
-    과목번호 char(4) not null primary key,
+	과목번호 char(4) not null primary key,
     이름 varchar(20) not null,
     강의실 char(3) not null,
     개설학과 varchar(20) not null,
@@ -22,8 +22,10 @@ create table 과목 (
 );
 
 
+
+
 create table 수강(
-    학번 char(6) not null,
+	학번 char(6) not null,
     과목번호 char(4) not null,
     신청날짜 date not null,
     중간성적 int null default 0,
@@ -229,3 +231,104 @@ select * from 과목1;
 -- 수강자가 2명 미만인 과목에 대한 과목 정보를 모두 삭제
 
 create database chap5;
+
+create table 과목2(
+	과목번호 char(4) not null primary key,
+	이름 varchar(20) not null,
+	강의실 char(5) not null,
+	개설학과 varchar(20) not null,
+	시수 int not null
+);
+
+create table 학생2(
+	학번 char(4) not null,
+    이름 varchar(20) not null,
+    주소 varchar(50) default '미정',
+    학년 int not null,
+    나이 int null,
+    성별 char(1) not null,
+    휴대폰번호 char(13) null,
+    소속학과 varchar(20) null, -- null 생략 가능
+    primary key(학번), -- 기본키 (중복 x, null 값 x)
+	unique(휴대폰번호) -- 후보키 (중복 x, null 값 o)
+);
+
+desc 학생2;
+
+show create table 학생2;
+
+create table 수강2(
+	학번 char(6) not null,
+    과목번호 char(4) not null,
+    신청날짜 date not null,
+    중간성적 int null default 0,
+    기말성적 int null default 0,
+    평가학점 char(1) null,
+    primary key(학번,과목번호), -- 학번과 과목번호가 동시에 같은 값을 가질때만 중복값 입력이 불가하다. 학번 값이 다르고 과목번호가 같으면 입력 가능 
+    foreign key(학번) references 학생2(학번),
+    foreign key(과목번호) references 과목2(과목번호)
+    -- foreign key (참조하는_열) references 참조하는_테이블(참조되는_열(참조하는 테이블의 primary key에 해당하는 field를 입력해줘야함))
+    -- foreign key는 한 테이블의 레코드와 다른 테이블의 레코드 사이의 관계를 정의 
+    -- 데이터의 변경이나 삭제가 발생할 때 이에 관련된 다른 테이블의 데이터도 처리
+    -- 수강2 테이블의 과목번호 열 값은 과목2 테이블의 과목번호 열의 값 중 하나만 가질 수 있으며, 과목2 테이블에 없는 값을 참조하는 경우에는 제한이 걸릴 것
+);
+select * from 수강2;
+
+insert into 과목2 values('c111','database',A-123,'산업공학'); -- 오류(문자에 따옴표 없음)
+insert into 과목2 values('c111','database','A-123','산업공학'); -- 오류(필드 5개인데 4개만 입력)
+insert into 과목2 values('c111','database','A-123','산업공학',3); -- 정상
+
+insert into 학생2(학번,이름,학년,나이,성별,휴대폰번호,소속학과)
+values('s111','박태환',4,null,'남','010-1111-1111','산업공학');
+insert into 학생2(학번,이름,학년,나이,성별,휴대폰번호,소속학과)
+values('s222','박태환',2,null,'남','010-1111-1111','산업공학'); -- 휴대폰번호 중복 입력 안됨
+insert into 학생2(학번,이름,학년,나이,성별,휴대폰번호,소속학과)
+values('s222','박태환',2,null,'남','010-2222-2222','산업공학');
+
+insert into 수강2(학번,과목번호,신청날짜) -- 정상(학생2에 s111 존재, 과목2에 c111 존재)
+values('s111','c111','2019-12-31'); 
+insert into 수강2(학번,과목번호,신청날짜) -- 외래키 오류(과목2에 c222가 존재x)
+values('s111','c222','2019-12-31',93,98,'A'); 
+insert into 수강2(학번,과목번호,신청날짜,중간성적,기말성적,평가학점) -- 기본키 오류(학번, 과목번호가 중복된 값이 존재)
+values('s111','c111','2019-12-31',93,98,'A'); 
+insert into 수강2(학번,과목번호,신청날짜,중간성적,기말성적,평가학점) -- 정상
+values('s222','c111','2019-12-31',93,98,'A'); 
+
+-- 학생2(박태환 데이터 2개), 과목2(1개), 수강2(2개)
+select * from 학생2;
+
+-- create table 과목3 as (select * from 과목2);
+-- 과목 2번 테이블을 복사해 과목3 테이블 생성
+  
+insert into 과목2 select * from 과목;
+-- 과목에 있는 데이터를 과목2 테이블에 복사함 (원본 table의 colum 개수 >= 복사할 table column 개수 and 빈 column의 데이터 타입이 null값이어야 가능)
+
+insert into 학생2 select * from 학생;
+insert into 수강2 select * from 수강;
+alter table 학생2 add 등록날짜 datetime not null default '2019-12-30';
+-- 학생2 테이블에 "등록날짜" 열이 추가되고, 모든 레코드에는 '2019-12-30' 값을 갖는 등록날짜가 기본값으로 설정
+-- alter table은 데이터베이스의 테이블을 수정하고 변경
+
+alter table 학생2 drop column 등록날짜;
+-- 학생2 테이블에서 "등록날짜"라는 열을 삭제
+
+-- alter table 테이블 이름 change 기존이름 신규이름 데이터타입; 
+-- 테이블의 필드명 변경
+alter table 학생2 change 이름 학생이름 varchar(20);
+select * from 학생2;
+
+-- alter table 테이블이름 rename to 신규이름; 
+-- 테이블 이름 변경
+alter table 학생2 rename to 재학생2;
+select * from 재학생2;
+
+-- 과목2, 수강2, 재학생2
+-- 수강2 테이블은 과목2 테이블과 재학생2 테이블을 외래키로 참조 
+
+drop table 과목2; 
+-- 수강2 테이블이 과목2 테이블을 참조하고 있으므로 삭제 안됨
+drop table 수강2;
+drop table 과목2;
+
+select * from 과목2; 
+-- 삭제되었기 때문에 결과 없음
