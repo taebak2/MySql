@@ -2,7 +2,7 @@ create database univDB;
 use univDB;
 
 create table 학생(
-	학번 char(4) not null,
+    학번 char(4) not null,
     이름 varchar(20) not null,
     주소 varchar(50) null default "미정",
     학년 int not null,
@@ -14,7 +14,7 @@ create table 학생(
 );
 
 create table 과목 (
-	과목번호 char(4) not null primary key,
+    과목번호 char(4) not null primary key,
     이름 varchar(20) not null,
     강의실 char(3) not null,
     개설학과 varchar(20) not null,
@@ -25,7 +25,7 @@ create table 과목 (
 
 
 create table 수강(
-	학번 char(6) not null,
+    학번 char(6) not null,
     과목번호 char(4) not null,
     신청날짜 date not null,
     중간성적 int null default 0,
@@ -241,7 +241,7 @@ create table 과목2(
 );
 
 create table 학생2(
-	학번 char(4) not null,
+    학번 char(4) not null,
     이름 varchar(20) not null,
     주소 varchar(50) default '미정',
     학년 int not null,
@@ -258,7 +258,7 @@ desc 학생2;
 show create table 학생2;
 
 create table 수강2(
-	학번 char(6) not null,
+    학번 char(6) not null,
     과목번호 char(4) not null,
     신청날짜 date not null,
     중간성적 int null default 0,
