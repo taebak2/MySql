@@ -264,13 +264,16 @@ create table 수강2(
     중간성적 int null default 0,
     기말성적 int null default 0,
     평가학점 char(1) null,
-    primary key(학번,과목번호), -- 학번과 과목번호가 동시에 같은 값을 가질때만 중복값 입력이 불가하다. 학번 값이 다르고 과목번호가 같으면 입력 가능 
+    primary key(학번,과목번호), -- 학번과 과목번호가 동시에 같은 값을 가질때만 중복값 입력 불가 (만일 학번, 과목번호 둘 중 한 개만 중복값을 가져도 입력 불가로 만들고 싶다면 primary key를 각각 선언 해줘야 함)
+			       -- 학번 값이 다르고 과목번호가 같으면 입력 가능 
+    
     foreign key(학번) references 학생2(학번),
     foreign key(과목번호) references 과목2(과목번호)
-    -- foreign key (참조하는_열) references 참조하는_테이블(참조되는_열(참조하는 테이블의 primary key에 해당하는 field를 입력해줘야함))
+	
+    -- foreign key (학생2의 field중 참조하는 열) references (참조하는_테이블) (참조되는_열 = 참조하는 테이블의 primary key에 해당하는 field를 입력해줘야함)
     -- foreign key는 한 테이블의 레코드와 다른 테이블의 레코드 사이의 관계를 정의 
     -- 데이터의 변경이나 삭제가 발생할 때 이에 관련된 다른 테이블의 데이터도 처리
-    -- 수강2 테이블의 과목번호 열 값은 과목2 테이블의 과목번호 열의 값 중 하나만 가질 수 있으며, 과목2 테이블에 없는 값을 참조하는 경우에는 제한이 걸릴 것
+    -- 수강2 테이블의 과목번호 열 값은 과목2 테이블의 과목번호 열의 값 중 하나만 가질 수 있으며, 과목2 테이블에 없는 값을 참조하는 경우에는 제한이 걸림
 );
 select * from 수강2;
 
@@ -281,7 +284,7 @@ insert into 과목2 values('c111','database','A-123','산업공학',3); -- 정�
 insert into 학생2(학번,이름,학년,나이,성별,휴대폰번호,소속학과)
 values('s111','박태환',4,null,'남','010-1111-1111','산업공학');
 insert into 학생2(학번,이름,학년,나이,성별,휴대폰번호,소속학과)
-values('s222','박태환',2,null,'남','010-1111-1111','산업공학'); -- 휴대폰번호 중복 입력 안됨
+values('s222','박태환',2,null,'남','010-1111-1111','산업공학'); -- 학생2 테이블의 휴대폰번호 field 는 unique, 따라서 중복값 선언 불가 
 insert into 학생2(학번,이름,학년,나이,성별,휴대폰번호,소속학과)
 values('s222','박태환',2,null,'남','010-2222-2222','산업공학');
 
@@ -312,12 +315,12 @@ alter table 학생2 add 등록날짜 datetime not null default '2019-12-30';
 alter table 학생2 drop column 등록날짜;
 -- 학생2 테이블에서 "등록날짜"라는 열을 삭제
 
--- alter table 테이블 이름 change 기존이름 신규이름 데이터타입; 
+-- alter table 테이블 이름 change (기존이름) (신규이름) (데이터타입)(); 
 -- 테이블의 필드명 변경
 alter table 학생2 change 이름 학생이름 varchar(20);
 select * from 학생2;
 
--- alter table 테이블이름 rename to 신규이름; 
+-- alter table 테이블이름 rename to (신규이름); 
 -- 테이블 이름 변경
 alter table 학생2 rename to 재학생2;
 select * from 재학생2;
