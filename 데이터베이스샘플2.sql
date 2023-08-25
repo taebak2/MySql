@@ -328,3 +328,80 @@ update 대학생2 set 성별='여' where 성별 = 'F';
 delete from 교수2 
 where 학과코드 in ( select 학과코드 from 대학생2 group by 학과코드 having count(*) <10);
 select * from 교수2;
+
+-- 대학생2 학번(기본키), 학과코드(외래키)
+-- 시험2 학번(외래키)
+-- 교수2 학과코드(기본키) 설정해서 테이블 생성
+
+create table 대학생2
+(
+	이름 varchar(100) null,     
+	학번 varchar(11) not null,
+	생년월일 varchar(6) null,
+	성별 varchar(1) null,
+	입학년도 varchar(4) null,
+	전화번호 varchar(11) null,
+	학과코드 varchar(3) null,
+    primary key(학번),
+    foreign key(학과코드) REFERENCES 교수2(학과코드)
+);
+
+create table 시험2
+(
+	학번 varchar(11)not null,
+	국어 int,
+	영어 int,
+	수학 int,
+    foreign key(학번) references 대학생2(학번)
+);
+
+create table 교수2
+(
+	학과코드 varchar(3) not null, 
+	학과명 varchar(100) null, 
+	학과담당교수 varchar(100) null, 
+    primary key(학과코드)
+);
+
+insert into 교수2 select* from 교수;
+insert into 대학생2 select* from 대학생;
+insert into 시험2 select* from 시험;
+
+-- 시험2 테이블에 합계 필드를 추가
+-- 합계 필드는 국어 + 영어 + 수학 점수의 합계로 데이터를 삽입
+alter table 시험2 add 합계 int null default'0';
+update 시험2 set 합계=국어+영어+수학;
+-- UPDATE 문은 이미 존재하는 데이터를 수정할 때 사용
+-- INSERT INTO 문은 데이터베이스 테이블에 새로운 데이터를 추가할 때 사용
+
+select * from 시험2;
+
+-- 뷰(고득점학생) v1_고득점학생
+-- 이름, 학번, 점수
+-- 합계가 270점 이상
+
+create view v1_고득점학생(이름,학번,점수)
+as select 이름,대학생2.학번,합계 -- 학번이 어느 테이블의 학번인지 모르기 때문에 경로를 적어줘야함.
+from 대학생2 join 시험2 on 대학생2.학번=시험2.학번
+where 합계>=270; 
+select * from v1_고득점학생;
+
+-- 대학생2와 시험2 테이블을 활용해 v2_남학생 뷰를 생성
+-- v2_남학생 뷰는 이름,학번,학과코드,점수로 구성
+
+create view v2_남학생(이름,학번,학과코드,점수)
+as select 이름,대학생2.학번,학과코드,합계
+from 대학생2 join 시험2 on 대학생2.학번=시험2.학번
+where 성별='M';
+select * from v2_남학생;
+
+-- v2_남학생 뷰를 활용해 v3_고득점남학생 뷰를 생성
+-- v3_고득점남학생 이름, 학번, 점수로 구성하되
+-- 합계 점수가 250점 이상인 데이터로 구성
+
+create view v3_고득점남학생(이름,학번,점수)
+as select 이름,학번,점수 
+from v2_남학생 
+where 점수>=250; -- 합계는 v2에 존재하지않는데 where에 합계를 사용 가능?
+
+select * from v3_고득점남학생;
