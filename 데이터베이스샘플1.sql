@@ -335,3 +335,53 @@ drop table 과목2;
 
 select * from 과목2; 
 -- 삭제되었기 때문에 결과 없음
+
+-- 3학년 혹은 4학년 학생의 학생이름, 나이, 성, 학년으로 구성된 'v1_고학년학생'뷰 
+create view v1_고학년학생(학생이름,나이,성,학년)
+as select 이름,나이,성별,학년 
+from 학생 
+where 학년>=3 and 학년<=4;
+-- 뷰를 통해 데이터를 수정하거나 삽입하는 작업은 기본 테이블을 직접 조작해야함
+-- 뷰의 주요 목적은 데이터의 가시성과 쿼리의 재사용을 향상
+
+select * from v1_고학년학생;
+
+-- v2_과목수강현황 뷰는 각 과목별로 해당 과목의 과목번호, 강의실 및 수강인원수를 나타냄
+create view v2_과목수강현황(과목번호,강의실,수강인원수)
+as select 과목.과목번호,강의실,count(과목.과목번호)
+from 과목 join 수강 on 과목.과목번호 = 수강.과목번호
+group by 과목.과목번호;
+-- having 절은 그룹화된 데이터에서 필터링
+-- where 절은 원본 데이터에서 필터링
+
+create view v3_고학년여학생
+as select * from v1_고학년학생 where 성='여';
+-- v1_고학년학생 뷰에서 성별이 여성인 고학년 학생들만을 선택하여 새로운 뷰 v3_고학년여학생을 생성
+select * from v3_고학년여학생;
+
+-- 고학년여학생 정보 검색
+select * from v1_고학년학생 where 성='여';
+
+-- 뷰를 사용하지 않고 select문으로 
+-- 수강생 인원이 가장 많은 과목과 가장 적은 과목에 대한 결과를 추출
+
+select * from v2_과목수강현황
+where 수강인원수 = (select max(수강인원수) from v2_과목수강현황) or 
+수강인원수 = (select min(수강인원수) from v2_과목수강현황);
+
+drop view v1_고학년학생;
+
+select * from v3_고학년여학생; 
+-- v3는 v1을 바탕으로 만들어져서 v3는 실행 불가능 
+
+-- 인덱스 생성
+create index idx_수강 on 수강(학번,과목번호);
+show index from 수강;
+
+create unique index idx_과목 on 과목(이름 asc);
+-- 테이블 값에 중복이 없는 유일한 인덱스 생성
+
+drop index idx_수강 on 수강;
+-- 인덱스 삭제
+alter table 과목 drop index idx_과목;
+-- 인덱스 삭제 방법2
