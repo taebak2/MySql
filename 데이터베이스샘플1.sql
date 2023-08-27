@@ -36,6 +36,7 @@ create table 수강(
 
 -- 사용자 계정 생성
 CREATE user 'manager' identified by '1234';
+
 -- 사용자 계정 권한 부여
 grant all on *.* to 'manager';
 
