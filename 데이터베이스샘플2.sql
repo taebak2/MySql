@@ -436,7 +436,7 @@ select 이름, 학번, 생년월일 from 대학생 where left(생년월일,2)>=9
  -- select 이름, 대학생.학번, round((시험.국어+시험.영어+시험.수학)/3,0) as 평균 
  -- from 대학생 join 시험 on 대학생.학번=시험.학번
  -- where left(생년월일,2)>=90;
- -- round함수에서 sum사용하려면 group by 써야함 
+ -- sum사용하려면 group by 써야함 
  
 select 이름,대학생.학번,round((국어+영어+수학)/3,0) as 평균
 from 대학생 join 시험 on 대학생.학번=시험.학번
