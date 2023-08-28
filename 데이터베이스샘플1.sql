@@ -386,3 +386,73 @@ drop index idx_수강 on 수강;
 -- 인덱스 삭제
 alter table 과목 drop index idx_과목;
 -- 인덱스 삭제 방법2
+
+select 학번, sum(기말성적)/count(*) as 기말평균,
+-- 평균 기말 시험 점수를 계산하기 위해 기말 시험 점수의 합을 레코드 수로 나눔
+round(sum(기말성적)/count(*),2) as 기말평균2
+-- 기말평균 반올림하여 소수점 2자리까지 표시
+-- ROUND 함수는 주어진 숫자를 지정한 소수점 자릿수로 반올림하는 데 사용되는 SQL 함수
+from 수강 group by 학번;
+
+select length(소속학과), right(학번,2), 
+repeat('*',나이), concat(소속학과,'학과')
+from 학생;
+-- length 문자열의 길이 수 반환(한글은 2개씩 반환)
+-- 일반적으로 대부분의 데이터베이스 시스템에서는 문자열 길이를 계산할 때, 문자 인코딩에 따라 각 문자의 바이트 수가 다르게 적용 
+-- 한글은 UTF-8 인코딩에서 일반적으로 3바이트로 표현
+-- right 함수는 문자열의 오른쪽부터 길이만큼만 반환
+-- repeat 함수는 '*'문자열을 나이만큼 반복하여 반환
+-- concat 함수는 두 개 이상의 문자열을 결합하여 하나의 문자열로 만듬
+
+select substring(주소,1,2), replace(substring(휴대폰번호,5,9),'-',',') 
+from 학생;
+-- substring 함수는 "주소" 열에서 첫 번째 문자부터 두 번째 문자까지의 부분 문자열을 추출
+-- replace "휴대폰번호" 열에서 다섯 번째 문자부터 아홉 번째 문자까지의 부분 문자열을 추출한 뒤
+-- 그 부분 문자열 내의 '-' 문자를 ',' 문자로 치환
+
+select 신청날짜,last_day(신청날짜) from 수강 where year(신청날짜)='2019';
+-- last_day(신청날짜): "신청날짜"의 해당 월의 마지막 날짜를 계산하여 출력
+
+select sysdate(), datediff(신청날짜,'2019-01-01') from 수강;
+-- datediff: "신청날짜" 열의 값과 '2019-01-01' 사이의 날짜 차이를 계산하여 출력 
+-- 이 함수는 몇 일이 지났는지를 반환
+-- SYSDATE() 함수는 데이터베이스 시스템에서 현재 날짜와 시간을 반환하는 함수
+
+select 신청날짜, date_format(신청날짜,'%b/%d/%y') from 수강;
+-- date_format(신청날짜, '%b/%d/%y'): "신청날짜" 열의 값을 원하는 형식으로 포맷팅 
+-- %b는 축약된 월 이름, %d는 일(day), %y는 년도의 뒤 두 자리를 나타냄  
+-- ex)'2021-08-15'라면 'Aug/15/21'로 포맷팅
+
+
+delimiter //
+create procedure InserOrUpdateCourse(
+	in CourseNo varchar(4),
+    in CourseName varchar(20),
+    in CourseRoom char(3),
+    in CourseDept varchar(20),
+    in CourseCredit int)
+begin
+	declare Count int;
+    select count(*) into Count from 과목 where 과목번호=CourseNo;
+    if(Count=0) then 
+		insert into 과목(과목번호, 이름, 강의실, 개설학과, 시수)
+        values(CourseNo, CourseName, CourseRoom, CourseDept, CourseCredit);
+	else 
+		update 과목
+        set 이름=CourseName, 강의실=CourseRoom, 개설학과=CourseDept, 시수=CourseCredit
+        where 과목번호 = CourseNo;
+	end if;
+end // 
+delimiter ;
+
+-- declare Count int;: Count라는 변수를 선언, 이 변수는 존재하는 강좌 레코드의 개수를 저장
+-- select count(*) into count from 과목 where 과목번호=CourseNo;: Count 변수에 존재하는 강좌 레코드의 개수를 가져오는 쿼리를 실행
+-- 해당 강좌 번호가 이미 데이터베이스에 존재하는지 확인
+-- If(Count=0) then ... else ... end if;: Count 변수의 값에 따라 조건문을 실행 
+-- 만약 Count가 0인 경우, 새로운 강좌 정보를 삽입 
+-- 그렇지 않은 경우, 기존 강좌 정보를 업데이트
+-- insert into 과목 ... values(...);: 새로운 강좌 정보를 삽입
+-- update 과목 ... where 과목번호 = CourseNo;: 기존 강좌 정보를 업데이트
+
+select * from 과목;
+
