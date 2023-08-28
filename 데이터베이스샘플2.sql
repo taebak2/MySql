@@ -407,3 +407,100 @@ from v2_남학생
 where 점수>=250; -- 합계는 v2에 존재하지않는데 where에 합계를 사용 가능?
 
 select * from v3_고득점남학생;
+
+-- 시험2 테이블에 시험날짜를 추가하고 기본 값은 오늘날짜가 들어가게 해주세요 
+-- 시험2 테이블에서 국어,영어,수학 점수의 평균을 소수점 3자리까지 구하되
+-- 반올림하여 구하시오
+
+alter table 시험2 add 시험날짜 date default '2023-08-28';
+select * from 시험2;
+--  date 데이터 타입을 가지며, 기본값(default)으로 '2023-08-28' 날짜가 설정
+-- alter table 시험2 add 시험날짜 date default (current_date);
+-- 8.0버전 이상부터 가능
+
+-- 그 이하 버전
+-- alter table 시험2 add 시험날짜 datetime default now();
+-- 형식 변경
+
+select 학번, round(sum(국어+영어+수학) / 3,3) as 평균
+from 시험2 group by 학번;
+
+-- 대학생 테이블에서 90년 이후에 태어난 학생의
+-- 이름, 학번, 생년월일을 검색하세요 left 이용
+select 이름, 학번, 생년월일 from 대학생 where left(생년월일,2)>=90;
+
+-- 대학생 테이블에서 90년 이후에 태어난 학생의
+-- 이름, 학번, 평균을 검색하되
+-- 평균은 반올림하여 정수로 표시
+
+ -- select 이름, 대학생.학번, round((시험.국어+시험.영어+시험.수학)/3,0) as 평균 
+ -- from 대학생 join 시험 on 대학생.학번=시험.학번
+ -- where left(생년월일,2)>=90;
+ -- round함수에서 sum사용하려면 group by 써야함 
+ 
+select 이름,대학생.학번,round((국어+영어+수학)/3,0) as 평균
+from 대학생 join 시험 on 대학생.학번=시험.학번
+where left(생년월일,2)>=90;
+
+select * from 교수2;
+-- 임용일자 date 타입으로 column 추가
+alter table 교수2 add 임용일자 date; 
+
+update 교수2 set 임용일자='2020-03-01' where 학과담당교수='이세종';
+update 교수2 set 임용일자='2019-05-08' where 학과담당교수='마이클잭슨';
+update 교수2 set 임용일자='2021-06-13' where 학과담당교수='김판사';
+update 교수2 set 임용일자='2008-10-09' where 학과담당교수='나유연';
+update 교수2 set 임용일자='2022-01-03' where 학과담당교수='장영실';
+update 교수2 set 임용일자='2023-02-08' where 학과담당교수='송청결';
+
+-- 교수2 테이블에서 현재까지 근무일수를 구하는데
+-- 이세종 3년 5개월 28일 
+
+select 학과담당교수,floor(datediff(sysdate(),임용일자)/365) as 근무년도, 
+timestampdiff(month, 임용일자, curdate()) - floor(datediff(sysdate(),임용일자)/365)*12 
+as 근무개월
+from 교수2;
+-- curdate()는 현재 날짜를 반환
+-- timestampdiff(unit, start_datetime, end_datetime)
+-- unit: 계산하려는 시간 간격의 단위 YEAR', 'MONTH', 'DAY', 'HOUR', 'MINUTE', 'SECOND'
+-- start_datetime 계산을 시작하는 날짜 및 시간
+-- end_datetime 계산을 끝내는 날짜 및 시간
+-- TIMESTAMPDIFF(MONTH, '2021-01-15', '2023-08-28')는 
+-- '2021-01-15'와 '2023-08-28' 사이의 월 수를 계산하여 결과로 31이 반환
+
+
+-- 교수2 테이블에서 데이터를 추가하는 프로시저 작성
+-- 만약, 학과코드가 이미 존재하면 select 구문을 실행
+-- 프로시저 이름은 InsertProcessor
+
+delimiter //
+create procedure InsertProcessor(
+	in 학과코드2 varchar(10),
+    in 학과명 varchar(100),
+    in 학과담당교수 varchar(100),
+    in 임용일자 date)
+    
+begin
+	declare 개수 int;
+    select count(*) into 개수 from 교수2 where 학과코드=학과코드2;
+    if(개수=0) then 
+		insert into 교수2(학과코드,학과명,학과담당교수,임용일자)
+        values(학과코드2,학과명,학과담당교수,임용일자);
+	else 
+		select * from 교수2;
+	end if;
+end // 
+delimiter ;
+
+-- CREATE PROCEDURE InsertProcessor(...) BEGIN ... END // : 저장 프로시저의 정의를 시작
+-- IN 학과코드2 varchar(10), ... : 학과코드2 파라미터는 새로 추가된 파라미터로, 저장 프로시저 호출 시 학과 코드 정보를 전달
+-- DECLARE 개수 int;: 개수 변수를 선언, 이 변수는 해당 학과코드2를 가진 교수의 수를 저장
+-- SELECT COUNT(*) INTO 개수 FROM 교수2 WHERE 학과코드=학과코드2;: 학과코드2 파라미터와 일치하는 교수의 수를 계산하여 개수 변수에 저장
+-- IF(개수=0) THEN ... ELSE ... END IF;: 개수 변수의 값에 따라 조건문을 실행
+-- INSERT INTO 교수2 ... VALUES(...);: 학과코드2 파라미터를 사용하여 새로운 교수 정보를 삽입
+-- SELECT * FROM 교수2;: 이미 존재하는 경우 모든 교수 정보를 출력
+
+call InsertProcessor('107','수학과','김국어','2023-08-01');
+select * from 교수2;
+
+
