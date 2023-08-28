@@ -465,7 +465,7 @@ from 교수2;
 -- unit: 계산하려는 시간 간격의 단위 YEAR', 'MONTH', 'DAY', 'HOUR', 'MINUTE', 'SECOND'
 -- start_datetime 계산을 시작하는 날짜 및 시간
 -- end_datetime 계산을 끝내는 날짜 및 시간
--- TIMESTAMPDIFF(MONTH, '2021-01-15', '2023-08-28')는 
+-- timestampdiff(MONTH, '2021-01-15', '2023-08-28')는 
 -- '2021-01-15'와 '2023-08-28' 사이의 월 수를 계산하여 결과로 31이 반환
 
 
@@ -492,13 +492,13 @@ begin
 end // 
 delimiter ;
 
--- CREATE PROCEDURE InsertProcessor(...) BEGIN ... END // : 저장 프로시저의 정의를 시작
--- IN 학과코드2 varchar(10), ... : 학과코드2 파라미터는 새로 추가된 파라미터로, 저장 프로시저 호출 시 학과 코드 정보를 전달
--- DECLARE 개수 int;: 개수 변수를 선언, 이 변수는 해당 학과코드2를 가진 교수의 수를 저장
--- SELECT COUNT(*) INTO 개수 FROM 교수2 WHERE 학과코드=학과코드2;: 학과코드2 파라미터와 일치하는 교수의 수를 계산하여 개수 변수에 저장
--- IF(개수=0) THEN ... ELSE ... END IF;: 개수 변수의 값에 따라 조건문을 실행
--- INSERT INTO 교수2 ... VALUES(...);: 학과코드2 파라미터를 사용하여 새로운 교수 정보를 삽입
--- SELECT * FROM 교수2;: 이미 존재하는 경우 모든 교수 정보를 출력
+-- create procedure InsertProcessor(...) begin ... end // : 저장 프로시저의 정의를 시작
+-- in 학과코드2 varchar(10), ... : 학과코드2 파라미터는 새로 추가된 파라미터로, 저장 프로시저 호출 시 학과 코드 정보를 전달
+-- declare 개수 int;: 개수 변수를 선언, 이 변수는 해당 학과코드2를 가진 교수의 수를 저장
+-- select count(*) into 개수 from 교수2 where 학과코드=학과코드2;: 학과코드2 파라미터와 일치하는 교수의 수를 계산하여 개수 변수에 저장
+-- if(개수=0) then ... else ... end if;: 개수 변수의 값에 따라 조건문을 실행
+-- insert into 교수2 ... values(...);: 학과코드2 파라미터를 사용하여 새로운 교수 정보를 삽입
+-- select * from 교수2;: 이미 존재하는 경우 모든 교수 정보를 출력
 
 call InsertProcessor('107','수학과','김국어','2023-08-01');
 select * from 교수2;
