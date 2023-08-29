@@ -504,3 +504,91 @@ call InsertProcessor('107','수학과','김국어','2023-08-01');
 select * from 교수2;
 
 
+-- 시험 테이블(국어,영어,수학)
+-- 3과목의 평균 점수(반올림해서 정수로 처리함)가 사용자가 입력한 점수보다
+-- 큰 점수의 개수를 구하는 프로시저를 생성
+-- CountAverage
+
+delimiter //
+create procedure CountAverage(
+	in InputScore int, -- 사용자가 입력할 점수
+	out Result int 	   -- 결과 점수  
+)
+
+begin
+	declare NoMoreData int default false;
+    declare Average int;
+	declare Kor int; 
+	declare Eng int; 
+	declare Math int; 
+    
+    declare ScoreCursor cursor for
+		select round((국어+영어+수학)/3,0) from 시험;
+    declare continue handler for not found set NoMoreData = true;
+		set Result=0;
+        
+	open ScoreCursor;
+		repeat
+			fetch ScoreCursor into Average;
+			if (Average > InputScore) then
+				set Result = Result+1;
+			end if;
+		until NoMoreData end repeat;
+    close ScoreCursor;
+			
+end //
+delimiter ;
+
+select @Result; -- 결과 화면 출력 
+
+-- 대학생2, 시험2 테이블을 이용하여
+-- 남녀우수학생 테이블을 생성
+-- 남녀우수학생 테이블은 성별로 합계 점수가 200점 이상인 학생들의 인원수
+-- 성별 인원수
+-- 남   16
+-- 요   14
+
+create table 남녀우수학생 (
+	성별 char(1) not null,
+    인원수 int not null default 0,
+    primary key(성별)
+);
+
+insert into 남녀우수학생
+select '남', count(*)from 대학생2 join 시험2 on 대학생2.학번=시험2.학번
+where 성별='M' and 합계>=200;
+insert into 남녀우수학생
+select '여', count(*)from 대학생2 join 시험2 on 대학생2.학번=시험2.학번
+where 성별='F' and 합계>=200;
+select * from 남녀우수학생;
+
+-- 대학생2 테이블에 새로운 데이터를 삽입
+-- 예) 홍길동 17000000 991001 M 2012 01099999999 105
+insert into 대학생2
+values ('홍길동','17000000','991001','M','2012','01099999999','105');
+
+-- 시험2 테이블에 성별 필드를 생성, 대학생 2 테이블의 데이터 가져옴 alter, update
+alter table 시험2 add 성별 char(1);
+update 시험2 set 성별 = (select 성별 from 대학생2 where 대학생2.학번=시험2.학번);
+select * from 시험2;
+
+-- 시험2 테이블에 새로운 데이터를 삽입할 때
+-- 예) 17000000 70 80 90 240 2023-08-28 11:22:30 M
+-- 남녀우수학생 테이블 데이터를 갱신하는 트리거를 생성
+-- 트리거 이름 GreatStudent
+
+delimiter //
+create trigger GreatStudent
+after insert on 시험2 for each row
+begin
+	if(new.합계>=200 and new.성별='M') then
+		update 남녀우수학생 set 인원수 = 인원수 + 1 where 성별='남';
+	elseif (new.합계>=200 and new.성별='F') then
+		update 남녀우수학생 set 인원수 = 인원수 + 1 where 성별='여';
+	end if;
+end // 
+delimiter ;
+
+insert into 시험2 values('17000000','70','80','90','240','2023-08-28','M');
+select * from 남녀우수학생;
+
