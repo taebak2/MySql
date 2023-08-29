@@ -456,3 +456,87 @@ delimiter ;
 
 select * from 과목;
 
+delimiter // 	
+--  MySQL에서 프로시저를 작성할 때, 기본 구문 구분 기호인 세미콜론(;)을 대신 //로 변경, 이렇게 함으로써 프로시저 정의를 구분
+create procedure SelectAverageOfBestScore( 
+    in Score int,			   
+    out Count int			  
+)
+-- 이름이 "SelectAverageOfBestScore"인 저장 프로시저를 생성 
+-- 이 프로시저는 입력 파라미터 Score와 출력 파라미터 Count를 가짐
+-- 사용자가 입력할 숫자
+-- 계산결과(인원수) 출력할 숫자
+	
+	begin			      
+	declare NoMoreData int default false; 
+	declare MidTerm int; 
+	declare Final int; 	   
+-- 프로시저의 시작, 이 안에서 프로시저의 로직을 작성
+-- 반복문의 종료 조건을 검사하기 위한 변수 NoMoreData를 선언하고 기본값을 false로 설정
+-- declare continue handler for not found set NoMoreData = true;: 커서가 데이터를 더 이상 찾지 못할 경우, 해당 핸들러가 호출되어 NoMoreData 변수를 true로 설정
+-- repeat: 반복문을 시작
+    declare Best int;	 -- 중간성적과 기말성적 중 큰 값 저장	 
+    declare ScoreListCursor cursor for 
+		select 중간성적,기말성적 from 수강; -- ScoreListCursor라는 이름의 커서를 선언, "수강" 테이블로부터 중간 성적과 기말 성적을 선택하는 쿼리의 결과를 가리킴
+	declare continue handler for not found set NoMoreData = true;
+		set Count=0;
+	open ScoreListCursor; -- 선언한 커서를 열어 데이터 읽기를 준비
+    	repeat
+	fetch ScoreListCursor into Midterm, Final;
+-- 커서로부터 한 줄의 데이터를 읽어 Midterm과 Final 변수에 할당
+        if Midterm > Final then
+			set Best = Midterm;
+		else
+			set Best = Final;
+		end if;
+-- 중간 성적과 기말 성적 중 더 높은 값을 Best 변수에 할당
+        if(Best>=Score) then
+			set Count = Count+1;
+		end if;
+-- 최고 점수가 입력된 Score보다 높거나 같다면, Count 변수를 1 증가
+	until NoMoreData end repeat;
+-- 데이터를 더 이상 찾을 수 없을 때까지 반복
+    close ScoreListCursor;
+-- 반복이 끝난 후 커서를 닫음
+end // 
+delimiter ;
+
+set @Count = 0; -- 출력 결과를 받아들일 변수명 (생략 가능함)
+call SelectAverageOfBestScore(80, @Count); -- 입력과 출력 파라미터
+select @Count; -- 결과 화면 출력 
+
+
+create table 학생2 as (select * from 학생);
+-- 학생 테이블을 복사해서 학생2 테이블을 생성
+
+create table 남녀학생총수(
+	성별 char(1) not null default 0,
+    인원수 int not null default 0,
+    primary key(성별)
+);
+
+insert into 남녀학생총수 select '남',count(*) from 학생2 where 성별='남';
+insert into 남녀학생총수 select '여',count(*) from 학생2 where 성별='여';
+
+select * from 남녀학생총수;
+
+delimiter //
+	create trigger AfterInsertStu
+    after insert on 학생2 for each row
+begin
+	if(new.성별='남') then
+		update 남녀학생총수 set 인원수 = 인원수 + 1 where 성별='남';
+	elseif(new.성별 = '여') then
+		update 남녀학생총수 set 인원수 = 인원수 + 1 where 성별='여';
+    end if;
+end //
+delimiter ;
+
+insert into 학생2
+values('s008','최동석','경기 수원', 2, 26, '남', '010-8888-6666', '컴퓨터');
+
+select * from 학생2;
+select * from 남녀학생총수;
+
+drop trigger AfterInsertStu; -- AfterInsertStu trigger 삭제 
+
