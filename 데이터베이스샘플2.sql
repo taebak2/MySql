@@ -592,3 +592,62 @@ delimiter ;
 insert into 시험2 values('17000000','70','80','90','240','2023-08-28','M');
 select * from 남녀우수학생;
 
+-- 시험 테이블에서 국어, 영어, 수학 점수의 평균으로
+-- 등급을 구하는 사용자 정의 함수를 구하세요
+-- 평균은 반올림하여 정수로 구하고
+-- 사용자 정의 함수 이름은 Fn_Result로 하세요
+-- 사용자 정의 함수를 이용하여 학번, 평균, 등급을 출력하세요
+-- 등급은 90점 이상 '수', 80점 이상 '우', 70점 이상 '미',
+-- 60점 이상 '양' 나머지는 '가'로 표시
+
+delimiter //
+create
+	function Fn_Result(score int)
+	returns varchar(10)
+    
+begin
+	declare ret_score varchar(6);
+	 if(score>=90) then
+		set ret_score='수';
+	elseif(score>=80) then
+		set ret_score='우';
+	elseif(score>=70) then
+		set ret_score='미';
+	elseif(score>=60) then
+		set ret_score='양';
+	else 
+		set ret_score='가';
+	end if;
+    return ret_score;
+end //
+delimiter ;
+
+select 학번,round((국어+영어+수학)/3,0) as '평균', Fn_Result(round((국어+영어+수학)/3,0)) as '등급' from 시험;
+
+-- 방법 2
+delimiter //
+create
+	function Fn_Result2(kor int, eng int, math int)
+	returns varchar(10)
+    
+begin
+	declare ret_average int;
+	declare ret_result varchar(10);
+    set ret_average = round((kor+eng+math)/3,0);
+	 if(ret_average>=90) then
+		set ret_result='수';
+	elseif(ret_average>=80) then
+		set ret_result='우';
+	elseif(ret_average>=70) then
+		set ret_result='미';
+	elseif(ret_average>=60) then
+		set ret_result='양';
+	else 
+		set ret_result='가';
+	end if;
+    return ret_result;
+end //
+delimiter ;
+
+select 학번, round((국어+영어+수학)/3,0) as '평균', Fn_Result2(국어,영어,수학) as '등급' from 시험;
+
