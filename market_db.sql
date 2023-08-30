@@ -114,7 +114,7 @@ create procedure user_pro3(
     out outValue int
 )
 begin
-	insert into member2 values(null,txtValue); -- null 왜 넣었는지 못들었음..
+	insert into member2 values(null,txtValue); 
 	select max(id) into outValue from member2;
 end //
 --  txtValue를 member2 테이블에 삽입한 후, 삽입된 행의 id 중 최대값을 outValue로 출력
