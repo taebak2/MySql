@@ -559,7 +559,6 @@ end //
 delimiter ;
 
 select Fn_Grade('A');
-
 select 학번,과목번호,평가학점, Fn_Grade(평가학점) as '평가 등급' from 수강;
 
 
@@ -569,7 +568,7 @@ create procedure tableInfo(
 	in tableName varchar(20)
 )
 begin
-	set @sqlQuery = concat('select * from ', tableName); -- CONCAT 함수는 문자열을 연결하는 데 사용되는 SQL 함수
+    set @sqlQuery = concat('select * from ', tableName); -- CONCAT 함수는 문자열을 연결하는 데 사용되는 SQL 함수
     prepare myQuery from @sqlQuery; 
     execute myQuery;
     
