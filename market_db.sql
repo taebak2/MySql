@@ -197,3 +197,12 @@ order by height desc limit 3;
 -- 멤버 아이디, 구입 수량의 합계를 구하세요
 select (mem_id) as "멤버 아이디" , sum(amount) as "구입 수량의 합계" from buy 
 group by mem_id;
+
+-- buy 테이블에서 멤버 아이디별로 묶어서
+-- 멤버 아이디, 총 구매 금액을 구하되
+-- 총 구매 금액이 1000보다 큰 데이터를 대상으로 하세요
+-- 총 구매 금액은 가격*수량의 합계로 구합니다
+
+select mem_id, sum(price * amount) as "총 구매 금액" from buy group by mem_id having sum(price * amount)>1000;
+-- having 절은 group by 절 뒤에 위치하며, 그룹화된 결과에 대한 조건을 지정
+-- having 절은 집계 함수 (예: sum, count, avg 등)를 사용한 결과에 대한 조건을 검사
