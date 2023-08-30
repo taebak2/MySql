@@ -141,7 +141,9 @@ begin
 	declare debutYear int;
     select year(debut_date) into debutYear from member
     where mem_name = userName; 
-    -- member 테이블에서 mem_name 값이 userName과 일치하는 행을 찾아서 해당 행의 debut_date 필드 값을 년도로 변환한 후, 그 값을 debutYear 변수에 저장
+    -- member 테이블에서 mem_name 값이 userName과 일치하는 행을 찾아서
+    -- 해당 행의 debut_date 필드 값을 년도로 변환한 후, 
+    -- 그 값을 debutYear 변수에 저장
 	if(debutYear>=2015) then
 		set userResult = "신인 가수";
 	else 
