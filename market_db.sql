@@ -70,3 +70,128 @@ select * from member where mem_name like '%핑크';
 -- 멤버이름이 에이핑크인 회원의 평균키보다 큰 걸그룹의 멤버이름,평균키를 검색
 -- 서브쿼리 사용
 select mem_name, height from member where height > (select height from member where mem_name='에이핑크');  
+
+-- '$$' 범위 안 코드들이 ';' 만나기 전까지 한번에 실행된다. 
+delimiter $$ 
+create procedure user_pro1(
+	in userName varchar(10)
+)
+begin
+	select * from member where mem_name=userName;
+end $$ 
+delimiter ; 
+call user_pro1('블랙핑크');
+
+-- 프로시저 이름 user_pro2
+-- 멤버 인원수와 멤버키를 입력받아
+-- 입력받은 숫자보다 큰 멤버의 모든 정보를 출력
+
+drop procedure if exists user_pro2;
+delimiter //
+create procedure user_pro2(
+	in userNum int,
+	in userHeight int
+)
+begin
+	select * from member where mem_number > userNum
+    and height > userHeight;
+end //
+delimiter ;
+
+call user_pro2(4,160);
+
+
+
+create table if not exists member2(
+	id int auto_increment primary key, -- 자동으로 증가하는 순번
+    txt char(10)
+);
+
+drop procedure if exists user_pro3;
+delimiter //
+create procedure user_pro3(
+	in txtValue char(10),
+    out outValue int
+)
+begin
+	insert into member2 values(null,txtValue); -- null 왜 넣었는지 못들었음..
+	select max(id) into outValue from member2;
+end //
+--  txtValue를 member2 테이블에 삽입한 후, 삽입된 행의 id 중 최대값을 outValue로 출력
+delimiter ;
+
+call user_pro3('핑클',@myValue); -- 결과를 myValue로 받는다
+call user_pro3('원더걸스',@yourValue);
+select @myValue as '순번 출력';
+select @yourValue as '순번 출력';
+select * from member2;
+
+-- 데뷔 연도가 2015년 이전(2015년 포함 x)이면 "프로 가수"
+-- 데뷔 연도가 2015년 이후(2015년 포함)이면 "신인 가수"를 출력하는
+-- 프로시저를 생성 프로시저 이름 : user_pro4
+-- 사용자가 걸그룹 이름을 입력하면 결과를 출력 
+
+drop procedure if exists user_pro4;
+delimiter //
+create procedure user_pro4 (
+	in userName char(10), 
+    out userResult char(20)
+)
+begin
+	declare debutYear int;
+    select year(debut_date) into debutYear from member
+    where mem_name = userName; 
+    -- member 테이블에서 mem_name 값이 userName과 일치하는 행을 찾아서 해당 행의 debut_date 필드 값을 년도로 변환한 후, 그 값을 debutYear 변수에 저장
+	if(debutYear>=2015) then
+		set userResult = "신인 가수";
+	else 
+		set userResult = "프로 가수";
+	end if;
+end //
+delimiter ;
+
+call user_pro4('오마이걸',@result);
+select @result as 결과;
+
+-- procedure 사용해서 1부터 100까지합계 출력
+
+drop procedure if exists user_pro5;
+delimiter //
+create procedure user_pro5(
+
+)
+begin
+	declare sum int;
+    declare num int;
+    set sum=0;
+    set num=1;
+    
+	while (num <=100) do
+		set sum = sum+num;
+		set num = num+1;
+	end while;
+	select sum as '합계결과';
+end //
+delimiter ;
+
+call user_pro5();
+
+-- member 테이블에서 멤버 아이디, 멤버 이름, 데뷔 일자를 출력하되
+-- 데뷔 일자의 오름차순으로 출력
+select mem_id, mem_name,debut_date 
+from member order by debut_date;
+
+-- member 테이블에서 멤버 아이디, 멤버 이름, 데뷔 일자, 키를 출력하되
+-- 키가 164이상인 데이터에 대해서 키의 내림차순으로 출력
+select mem_id, mem_name,debut_date, height from member 
+where height >=164 order by height desc;
+
+-- member 테이블에서 멤버 이름, 데뷔 일자를 출력하되
+-- 키의 내림차순으로 하여 3개만 출력
+select mem_name,debut_date from member 
+order by height desc limit 3;
+
+-- buy 테이블에서 멤버 아이디별로 묶어서
+-- 멤버 아이디, 구입 수량의 합계를 구하세요
+select (mem_id) as "멤버 아이디" , sum(amount) as "구입 수량의 합계" from buy 
+group by mem_id;
