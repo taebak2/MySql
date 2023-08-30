@@ -540,3 +540,47 @@ select * from 남녀학생총수;
 
 drop trigger AfterInsertStu; -- AfterInsertStu trigger 삭제 
 
+delimiter //
+	create function Fn_Grade(grade char(1))
+	returns varchar(10) -- 이거 왜한거지?
+begin
+	declare ret_grade varchar(10);
+    if(grade='A') then
+		set ret_grade='최우수';
+	elseif(grade='B') then
+		set ret_grade='우수';
+	elseif(grade='C') then
+		set ret_grade='보통';
+	elseif(grade='D' or grade='F') then
+		set ret_grade='미흡';
+	end if;
+    return ret_grade;
+end //
+delimiter ;
+
+select Fn_Grade('A');
+
+select 학번,과목번호,평가학점, Fn_Grade(평가학점) as '평가 등급' from 수강;
+
+
+drop procedure if exists tableInfo;
+delimiter //
+create procedure tableInfo(
+	in tableName varchar(20)
+)
+begin
+	set @sqlQuery = concat('select * from ', tableName); -- CONCAT 함수는 문자열을 연결하는 데 사용되는 SQL 함수
+    prepare myQuery from @sqlQuery; 
+    execute myQuery;
+    
+-- set @sqlQuery = concat('select * from ', tableName);: 이 부분에서는 @sqlQuery라는 변수에 동적으로 생성할 SQL 쿼리를 저장 
+-- concat 함수를 사용하여 문자열 'select * from '과 입력받은 tableName을 연결하여 완전한 SQL 쿼리를 생성 
+-- 예를 들어, 만약 tableName이 '과목'이라면, @sqlQuery에 'select * from 과목'이 저장
+-- prepare myQuery from @sqlQuery;: @sqlQuery에 저장된 동적 쿼리를 준비
+-- 준비된 쿼리는 myQuery라는 이름으로 저장
+-- execute myQuery;: 이 부분에서는 준비된 쿼리인 myQuery를 실행
+end  //
+delimiter ;
+
+call tableInfo('과목');
+
